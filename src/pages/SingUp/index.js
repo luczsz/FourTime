@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, ActivityIndicator, SectionList } from 'react-native';
 
 import { Container, Title, Header, Content, Input, Submit, SubmitText, Cadst } from '../SingIn/style';
@@ -9,6 +9,7 @@ import * as SQLite from 'expo-sqlite';
 
 function OpenDB(){
   const db = SQLite.openDatabase("fourTime");
+  console.log(db);
   return db;
 }
 
@@ -17,6 +18,31 @@ const db = OpenDB();
 import { Feather } from '@expo/vector-icons';
 
 export default function SingUp() {
+
+  // verificação de ID
+  useEffect( () => {
+    var hasUser = false;
+    db.transaction((tx) => {
+        tx.executeSql(
+            "SELECT * FROM usuarios",
+            [],
+            (tx, results) => {
+                var len = results.rows.length;
+                if(len > 0){
+                    hasUser = true;
+                    //console.log('existem:' + results.rows.length + 'registros');
+                    setId( results.rows.length );
+                    console.log(results);
+                    
+                }
+                else{
+                    console.log('sem registros14');
+                    console.log(results);
+                }
+            }
+        );
+    })
+}, [])
 
   // Criação e verificação de existencia de base
   db.transaction( (tx) => {
@@ -44,14 +70,16 @@ export default function SingUp() {
         tx.executeSql(
           "INSERT INTO usuarios (id, username, senha) values (?, ?, ?);", [id, username, senha]
           )
-      }, (successCallback) => {
-        alert(successCallback.message);
-        console.log(successCallback.message);
-      },(error) =>{
-        console.log(error);
-      } )
+      },
+      (Error) => {
+          alert('Houve algum erro');
+      },
+      (successCallback) => {
+          setLoadingAuth(true);
+          navigation.navigate('Inicio');
+          
+      })
       
-      //navigation.navigate('Inicio');
 
 
     }
@@ -63,7 +91,7 @@ export default function SingUp() {
       </Header>
 
       <Content>
-
+            <Text> {id} </Text>
         <Input
           placeholder="Insira aqui um nome de usuario"
           autoCapitalize='none'

@@ -11,7 +11,6 @@ function OpenDB(){
   const db = SQLite.openDatabase("fourTimer");
   return db;
 }
-
 const db = OpenDB();
 
 export default function SingIn() {
@@ -38,8 +37,20 @@ export default function SingIn() {
       alert('Seu username está vazio');
       setLoadingAuth(true);
     }
-    setLoadingAuth(false);
-    alert(username);
+    
+    db.transaction( (tx) => {
+      tx.executeSql(
+          "SELECT COUNT(*) FROM usuarios WHERER username='?' AND senha='?' values(?, ?);", [username, senha]
+      )
+    },
+      (Error) => {
+          alert('Houve algum erro');
+          console.log(Error.message);
+      },
+      (successCallback) => {
+          alert('Deu certo');
+          
+      })
   }
   
   return (
