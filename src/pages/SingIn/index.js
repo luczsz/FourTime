@@ -35,21 +35,24 @@ export default function SingIn() {
 
     if(username === ''){
       alert('Seu username está vazio');
-      setLoadingAuth(true);
+      //setLoadingAuth(false);
+      return;
     }
     
     db.transaction( (tx) => {
       tx.executeSql(
-          "SELECT COUNT(*) FROM usuarios WHERER username='?' AND senha='?' values(?, ?);", [username, senha]
+        "SELECT COUNT(*) FROM usuarios WHERE username=? AND senha=?;", [username, senha],
+
+//        `SELECT COUNT(*) FROM usuarios `
       )
     },
       (Error) => {
           alert('Houve algum erro');
           console.log(Error.message);
-      },
-      (successCallback) => {
-          alert('Deu certo');
-          
+          setLoadingAuth(false);
+        },
+        (successCallback) => {
+          alert('deu certo');
       })
   }
   

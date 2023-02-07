@@ -45,9 +45,9 @@ export default function Home() {
                 var len = results.rows.length;
                 if(len > 0){
                     hasUser = true;
-                    console.log('existem:' + results.rows.length + 'registros');
+                    //console.log('existem:' + results.rows.length + 'registros');
                     setUs3r( results.rows.length );
-                    console.log(results);
+                    //console.log(results);
                     
                 }
                 else{
@@ -57,6 +57,29 @@ export default function Home() {
             }
         );
     })
+
+    function Listas(){
+      db.transaction((tx) => {
+       tx.executeSql(
+           "SELECT * FROM usuarios",
+           [],
+           (_, {rows}) => {
+               setUser([]);
+
+              console.log(rows._array);
+              rows._array.forEach((Object) => {
+                let list ={
+                  id: Object.id,
+                  user: Object.username,
+                }
+              })
+           }
+       ) 
+      })
+   };
+   Listas();
+
+
 }, [])
 
   function Registros(){
@@ -70,7 +93,7 @@ export default function Home() {
              rows._array.forEach( (childItem) =>{
                  let list ={
                      id: childItem.id,
-                     compras: childItem.titulo,
+                     compras: childItem.username,
                  }
                  setUser(oldArray => [...oldArray, list])
              })
@@ -100,7 +123,7 @@ export default function Home() {
         <Text> {us3r} </Text>
         <Button
           title='APERTE'
-          onPress={ () => Delet()}
+          onPress={ () => Registros()}
         />
 
    </View>
